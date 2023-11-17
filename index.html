@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caro Game</title>
+    <style>
+        body {
+            background-image: url('https://c4.wallpaperflare.com/wallpaper/135/692/935/astronaut-space-black-background-artwork-hd-wallpaper-preview.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            height: 105vh;
+
+        }
+
+        h1,h2 {
+            font-size: 50px;
+            color: brown;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 1px;
+        }
+
+        td {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ccc;
+            text-align: center;
+            font-size: 20px;
+            background-color: #eeeeee;
+
+        }
+
+        .info {
+            padding: 20px;
+            background-color: darkgrey;
+            text-align: left;
+        }
+
+        button {
+            font-size: 16px;
+            margin: 10px;
+            padding: 8px;
+            background-color: #4CAF50;
+        }
+
+
+    </style>
+</head>
+<body>
+<h1>GAME XO</h1>
+
+    <div>
+        <button onclick="startGame()">Bắt đầu</button>
+        <button onclick="resetGame()">Reset</button>
+        <table id="caroBoard"></table>
+    </div>
+
+    <div class="info-container">
+        <div class="info">
+            <h2>Thông tin trò chơi</h2>
+            <p>Người chơi hiện tại: <span id="currentPlayer">X</span></p>
+            <p>Điểm số:</p>
+            <p>Player X: <span id="scoreX">0</span></p>
+            <p>Player O: <span id="scoreO">0</span></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const boardSize = 15;
+    let currentPlayer = 'X';
+    let gameBoard = [];
+    let gameStarted = false;
+    let scoreX = 0;
+    let scoreO = 0;
+
+    function createBoard() {
+        const table = document.getElementById('caroBoard');
+
+        for (let i = 0; i < boardSize; i++) {
+            const row = table.insertRow(i);
+            gameBoard[i] = [];
+
+            for (let j = 0; j < boardSize; j++) {
+                const cell = row.insertCell(j);
+                cell.addEventListener('click', () => cellClick(i, j));
+                gameBoard[i][j] = "";
+            }
+        }
+    }
+
+    function cellClick(row, col) {
+        if (!gameStarted) {
+            alert('Vui lòng bắt đầu trò chơi bằng cách nhấn nút "Bắt đầu".');
+            return;
+        }
+
+        const cell = document.getElementById('caroBoard').rows[row].cells[col];
+
+        if (gameBoard[row][col] === '') {
+            gameBoard[row][col] = currentPlayer;
+            cell.innerHTML = currentPlayer;
+
+            if (checkWin(row, col)) {
+                alert(`Player ${currentPlayer} wins!`);
+                updateScore();
+                resetGame();
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                updateCurrentPlayer();
+            }
+        }
+    }
+
+    function checkWin(row, col) {
+        // Kiểm tra hàng ngang
+        let count = 1;
+        for (let i = col - 1; i >= 0 && gameBoard[row][i] === currentPlayer; i--) {
+            count++;
+        }
+        for (let i = col + 1; i < boardSize && gameBoard[row][i] === currentPlayer; i++) {
+            count++;
+        }
+        if (count >= 5) {
+            return true;
+        }
+
+        // Kiểm tra hàng dọc
+        count = 1;
+        for (let i = row - 1; i >= 0 && gameBoard[i][col] === currentPlayer; i--) {
+            count++;
+        }
+        for (let i = row + 1; i < boardSize && gameBoard[i][col] === currentPlayer; i++) {
+            count++;
+        }
+        if (count >= 5) {
+            return true;
+        }
+
+        // Kiểm tra đường chéo chính
+        count = 1;
+        for (let i = row - 1, j = col - 1; i >= 0 && j >= 0 && gameBoard[i][j] === currentPlayer; i--, j--) {
+            count++;
+        }
+        for (let i = row + 1, j = col + 1; i < boardSize && j < boardSize && gameBoard[i][j] === currentPlayer; i++, j++) {
+            count++;
+        }
+        if (count >= 5) {
+            return true;
+        }
+
+        // Kiểm tra đường chéo phụ
+        count = 1;
+        for (let i = row - 1, j = col + 1; i >= 0 && j < boardSize && gameBoard[i][j] === currentPlayer; i--, j++) {
+            count++;
+        }
+        for (let i = row + 1, j = col - 1; i < boardSize && j >= 0 && gameBoard[i][j] === currentPlayer; i++, j--) {
+            count++;
+        }
+        if (count >= 5) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function resetGame() {
+        gameBoard = [];
+        document.getElementById('caroBoard').innerHTML = '';
+        createBoard();
+        currentPlayer = 'X';
+        updateCurrentPlayer();
+        gameStarted = false;
+    }
+
+    function startGame() {
+        gameStarted = true;
+        updateCurrentPlayer();
+    }
+
+    function updateCurrentPlayer() {
+        document.getElementById('currentPlayer').innerText = currentPlayer;
+    }
+
+    function updateScore() {
+        if (currentPlayer === 'X') {
+            scoreX++;
+            document.getElementById('scoreX').innerText = scoreX;
+        } else {
+            scoreO++;
+            document.getElementById('scoreO').innerText = scoreO;
+        }
+    }
+
+    window.onload = createBoard;
+</script>
+
+</body>
+</html>
